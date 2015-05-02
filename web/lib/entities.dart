@@ -19,7 +19,7 @@ class NodeClass {
 
 class Node {
   final NodeClass nodeClass;
-  final List<Socket> inputs = [];
+  final List<InputSocket> inputs = [];
   final List<Socket> outputs = [];
   final List<Property> properties = [];
   Point position;
@@ -27,7 +27,7 @@ class Node {
 
   Node(this.nodeClass) {
     nodeClass.inputs.forEach((name, type) {
-      inputs.add(new Socket(type, SocketType.input, this, name));
+      inputs.add(new InputSocket(type, SocketType.input, this, name));
     });
     nodeClass.outputs.forEach((name, type) {
       outputs.add(new Socket(type, SocketType.output, this, name));
@@ -65,12 +65,19 @@ class Socket {
   Socket(this.valueType, this.socketType, this.node, this.name);
 }
 
+class InputSocket extends Socket {
+  Connection connection;
+
+  InputSocket(Type valueType, SocketType socketType, Node node, String name) :
+    super(valueType, socketType, node, name);
+}
+
 class Connection {
   int id;
   Point start, end;
   Type type;
   Socket startSocket;
-  Socket endSocket;
+  InputSocket endSocket;
 }
 
 var comparisonNodes = [

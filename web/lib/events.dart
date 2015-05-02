@@ -68,3 +68,5 @@ class StartDragDisplayEvent {
 
   StartDragDisplayEvent(this.display, [this.offset = const Point(0, 0)]);
 }
+
+class PropertyChangedEvent {}

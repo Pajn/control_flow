@@ -5,10 +5,12 @@ class PropertyComponent extends Component<Property> {
     addSubscription(element.onKeyUp.listen((e) {
       print(e.target.value);
       data.setValue(e.target.value);
+      dispatcher.add(new PropertyChangedEvent());
     }));
     addSubscription(element.onChange.listen((e) {
       print(e.target.value);
       data.setValue(e.target.value);
+      dispatcher.add(new PropertyChangedEvent());
     }));
   }
 

@@ -48,8 +48,11 @@ class SocketComponent extends SvgComponent {
             ..end = center
             ..type = type
             ..startSocket = socket
-            ..endSocket = socket
         );
+
+        if (socket.socketType == SocketType.input) {
+          draggingConnection.connection.endSocket = socket;
+        }
 
         connections.add(draggingConnection);
 
@@ -84,6 +87,8 @@ class SocketComponent extends SvgComponent {
                 ..connection.endSocket = socket
           );
         }
+
+        draggingConnection.connection.endSocket.connection = draggingConnection.connection;
         dispatcher.add(new StopCreateConnectionEvent(draggingConnection, created: true));
       }
     }));
