@@ -49,6 +49,10 @@ class SocketComponent extends SvgComponent {
         }
       }
 
+      if (draggingConnection.type == dynamic) {
+        draggingConnection.connection.type = type;
+      }
+
       Rectangle bb = element.getBoundingClientRect();
       if (socket.socketType == SocketType.output) {
         connections.add(
