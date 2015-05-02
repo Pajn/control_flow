@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>RAXA</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      .fill {
+        width: 100%;
+        height: 100%;
+      }
+
+      .node {
+        font-family: 'Ubuntu Mono', monospace;
+      }
+
+      .connection {
+        pointer-events: none;
+      }
+    </style>
+    <script async type="application/dart" src="main.dart"></script>
+    <script async src="packages/browser/dart.js"></script>
+  </head>
+  <body>
+    <div id="content" class="fill"></div>
+  </body>
+</html>
