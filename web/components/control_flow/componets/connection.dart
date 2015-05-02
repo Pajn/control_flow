@@ -1,14 +1,17 @@
 part of raxa;
 
-class ConnectionComponent extends SvgComponent<Connection> {
+class ConnectionComponent extends SvgComponent {
   final String tag = 'g';
+  final Connection connection;
 
-  get type => data.type;
-  get start => data.start;
-  get end => data.end;
+  ConnectionComponent(this.connection);
+
+  get type => connection.type;
+  get start => connection.start;
+  get end => connection.end;
 
   updateView() {
-    updateRoot(g(type: 'connection')([
+    updateRoot(g()([
       circle(attrs: {'cx': '${start.x}', 'cy': '${start.y}', 'r': '5', 'fill': colors[type], 'stroke-width': '0'}),
       path(attrs: {
         'fill': 'none', 'stroke': colors[type], 'strokeWidth': '2',
@@ -19,4 +22,4 @@ class ConnectionComponent extends SvgComponent<Connection> {
   }
 }
 
-connectionComponent(Connection connection) => vComponent(() => new ConnectionComponent(), data: connection);
+var connectionComponent = cachedComponent('connection');

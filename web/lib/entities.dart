@@ -19,14 +19,20 @@ class NodeClass {
 
 class Node {
   final NodeClass nodeClass;
+  final List<Socket> inputs = [];
+  final List<Socket> outputs = [];
   Map<String, dynamic> properties;
   Point position;
   int id;
 
-  Map<String, Type> get inputs => nodeClass.inputs;
-  Map<String, Type> get outputs => nodeClass.outputs;
-
-  Node(this.nodeClass);
+  Node(this.nodeClass) {
+    nodeClass.inputs.forEach((name, type) {
+      inputs.add(new Socket(type, SocketType.input, this, name));
+    });
+    nodeClass.outputs.forEach((name, type) {
+      outputs.add(new Socket(type, SocketType.output, this, name));
+    });
+  }
 }
 
 enum SocketType {input, output}
@@ -35,8 +41,9 @@ class Socket {
   final Type valueType;
   final SocketType socketType;
   final Node node;
+  final String name;
 
-  Socket(this.valueType, this.socketType, this.node);
+  Socket(this.valueType, this.socketType, this.node, this.name);
 }
 
 class Connection {

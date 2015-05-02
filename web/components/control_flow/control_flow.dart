@@ -1,16 +1,16 @@
 part of raxa;
 
-var createdNodes = [];
-var createdConnections = [];
+List<NodeComponent> createdNodes = <NodeComponent>[];
+List<ConnectionComponent> createdConnections = <ConnectionComponent>[];
 
 class ControlFlow extends Component {
   StartDragNodeEvent draggingNode;
-  Connection draggingConnection;
+  ConnectionComponent draggingConnection;
 
   var menuData = new MenuData();
 
   init() {
-    addSubscription(element.onClick.listen((e) {
+    addSubscription(element.onClick.matches('#background').listen((MouseEvent e) {
       menuData..position = e.page
               ..open = true;
       invalidate();
@@ -19,30 +19,36 @@ class ControlFlow extends Component {
     addSubscription(element.onMouseMove.listen((e) {
       if (draggingNode != null) {
         draggingNode.node.position = e.page - draggingNode.offset;
+        draggingNode.nodeComponent.invalidate();
         invalidate();
       } else if (draggingConnection != null) {
-        draggingConnection.end = e.page;
-        invalidate();
+        if (draggingConnection.connection.startSocket.socketType == SocketType.output) {
+          draggingConnection.connection.end = e.page;
+        } else {
+          draggingConnection.connection.start = e.page;
+        }
+        draggingConnection.invalidate();
       }
     }));
 
     addSubscription(element.onMouseUp.listen((e) {
       if (draggingNode != null) {
         draggingNode.node.position = e.page - draggingNode.offset;
-        dispatcher.add(new StopDragNodeEvent(draggingNode.node));
+        dispatcher.add(new StopDragNodeEvent(draggingNode.nodeComponent));
+        draggingNode.nodeComponent.dragging = false;
+        draggingNode.nodeComponent.invalidate();
         draggingNode = null;
-        invalidate();
       } else if (draggingConnection != null) {
-        draggingConnection.end = e.page;
         createdConnections.remove(draggingConnection);
         dispatcher.add(new StopCreateConnectionEvent(draggingConnection));
+        invalidate();
       }
     }));
 
     addSubscription(dispatcher.stream.listen((e) {
       if (e is StartDragNodeEvent) {
-        createdNodes.remove(e.node);
-        createdNodes.add(e.node);
+        createdNodes.remove(e.nodeComponent);
+        createdNodes.add(e.nodeComponent);
         draggingNode = e;
         invalidate();
       } else if (e is StartCreateConnectionEvent) {
@@ -50,14 +56,18 @@ class ControlFlow extends Component {
         draggingConnection = e.connection;
         invalidate();
       } else if (e is StopCreateConnectionEvent) {
+        draggingConnection.invalidate();
         draggingConnection = null;
+      } else if (e is RemoveConnectionEvent) {
+        createdConnections.remove(e.connection);
         invalidate();
       }
     }));
   }
 
   updateView() {
-    var nodesToDraw = createdNodes.map(nodeComponent).toList()..addAll(createdConnections.map(connectionComponent));
+    var nodesToDraw = createdNodes.map(nodeComponent).toList()
+      ..addAll(createdConnections.map(connectionComponent));
 
     updateRoot(vRoot(classes: ['fill'])([
       vSvgElement('svg', type: 'GraphRoot', attrs: const {'width': '100%', 'height': '100%'})([

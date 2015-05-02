@@ -30,6 +30,16 @@ initHelpers() {
   text = createHelper('text');
 }
 
+var cmpCache = new Expando();
+
+cachedComponent(String type) => (Component component) {
+  var cmp = cmpCache[component];
+  if (cmp == null) {
+    cmpCache[component] = cmp = vComponent(() => component, key: component, type: type);
+  }
+  return cmp;
+};
+
 var dispatcher = new StreamController.broadcast();
 
 main() {

@@ -26,17 +26,13 @@ class MenuComponent extends Component<MenuData> {
 
   MenuComponent(this.items);
 
-  closeMenu() {
-    dispatcher.add(CLOSE_MENU);
-  }
-
   init() {
     addSubscription(element.onMouseDown.matches('button').listen((e) {
       e.stopImmediatePropagation();
       data.open = false;
       invalidate();
       var nodeClass = items[int.parse(e.matchingTarget.getAttribute('data-index'))];
-      var node = new Node(nodeClass)..position = e.page;
+      var node = new NodeComponent(new Node(nodeClass)..position = e.page);
       createdNodes.add(node);
       dispatcher.add(new StartDragNodeEvent(e.page, node));
     }));

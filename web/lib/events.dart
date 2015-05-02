@@ -2,17 +2,20 @@ part of raxa;
 
 class StartDragNodeEvent {
   final Point offset;
-  final Node node;
+  final NodeComponent nodeComponent;
+  Node get node => nodeComponent.node;
 
-  StartDragNodeEvent(Point start, Node node):
-    offset = start - node.position,
-    this.node = node;
+  StartDragNodeEvent(Point start, NodeComponent nodeComponent):
+    offset = start - nodeComponent.node.position,
+    this.nodeComponent = nodeComponent {
+    nodeComponent.dragging = true;
+  }
 }
 
 class StopDragNodeEvent {
-  final Node node;
+  final NodeComponent nodeComponent;
 
-  StopDragNodeEvent(this.node);
+  StopDragNodeEvent(this.nodeComponent);
 }
 
 class DragNodeEvent {
@@ -22,14 +25,20 @@ class DragNodeEvent {
 }
 
 class StartCreateConnectionEvent {
-  final Connection connection;
+  final ConnectionComponent connection;
 
   StartCreateConnectionEvent(this.connection);
 }
 
 class StopCreateConnectionEvent {
-  final Connection connection;
+  final ConnectionComponent connection;
   final bool created;
 
   StopCreateConnectionEvent(this.connection, {this.created: false});
+}
+
+class RemoveConnectionEvent {
+  final ConnectionComponent connection;
+
+  RemoveConnectionEvent(this.connection);
 }
