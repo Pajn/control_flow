@@ -8,9 +8,12 @@ import 'package:uix/uix.dart';
 
 part 'components/control_flow/control_flow.dart';
 part 'components/control_flow/componets/connection.dart';
+part 'components/control_flow/componets/graph.dart';
 part 'components/control_flow/componets/menu.dart';
 part 'components/control_flow/componets/node.dart';
+part 'components/control_flow/componets/selected.dart';
 part 'components/control_flow/componets/socket.dart';
+part 'components/control_flow/properties/properties.dart';
 part 'lib/entities.dart';
 part 'lib/events.dart';
 

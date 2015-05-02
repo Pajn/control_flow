@@ -18,6 +18,51 @@
         height: 100%;
       }
 
+      .workspace {
+        display: flex;
+      }
+      .flex {
+        flex: 1;
+      }
+
+      .properties {
+        width: 300px;
+
+        color: white;
+        background: #555;
+      }
+
+      .properties h1 {
+        margin-top: 0;
+        padding: 8px;
+        background: #444;
+        font-size: 16px;
+      }
+
+      .property {
+        padding: 8px;
+      }
+
+      .property > label {
+        display: block;
+      }
+
+      .property > label > span {
+        display: inline-block;
+        width: 50%;
+      }
+
+      .property > label > input {
+        box-sizing: border-box;
+        padding: 4px 8px;
+        width: 50%;
+
+        color: white;
+        background-color: #999;
+        border: none;
+        border-radius: 5px;
+      }
+
       .node {
         font-family: 'Ubuntu Mono', monospace;
       }

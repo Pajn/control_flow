@@ -32,9 +32,9 @@ class MenuComponent extends Component<MenuData> {
       data.open = false;
       invalidate();
       var nodeClass = items[int.parse(e.matchingTarget.getAttribute('data-index'))];
-      var node = new NodeComponent(new Node(nodeClass)..position = e.page);
+      var node = new NodeComponent(new Node(nodeClass)..position = e.page - const Point(330, 45));
       createdNodes.add(node);
-      dispatcher.add(new StartDragNodeEvent(e.page, node));
+      dispatcher.add(new StartDragNodeEvent(e.page + const Point(-300, 0), node));
     }));
     addSubscription(element.onClick.listen((e) {
       e.stopPropagation();

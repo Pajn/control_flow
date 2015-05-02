@@ -14,7 +14,7 @@ class ConnectionComponent extends SvgComponent {
     updateRoot(g()([
       circle(attrs: {'cx': '${start.x}', 'cy': '${start.y}', 'r': '5', 'fill': colors[type], 'stroke-width': '0'}),
       path(attrs: {
-        'fill': 'none', 'stroke': colors[type], 'strokeWidth': '2',
+        'fill': 'none', 'stroke': colors[type], 'stroke-width': '2',
         'd': 'M ${start.x} ${start.y} C ${start.x + 70} ${start.y}, ${end.x - 70} ${end.y}, ${end.x} ${end.y}',
       }),
       circle(attrs: {'cx': '${end.x}', 'cy': '${end.y}', 'r': '5', 'fill': colors[type]}),

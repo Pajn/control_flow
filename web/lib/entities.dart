@@ -21,7 +21,7 @@ class Node {
   final NodeClass nodeClass;
   final List<Socket> inputs = [];
   final List<Socket> outputs = [];
-  Map<String, dynamic> properties;
+  final List<Property> properties = [];
   Point position;
   int id;
 
@@ -32,6 +32,25 @@ class Node {
     nodeClass.outputs.forEach((name, type) {
       outputs.add(new Socket(type, SocketType.output, this, name));
     });
+    nodeClass.properties.forEach((name, type) => properties.add(new Property(name, type)));
+  }
+}
+
+class Property {
+  final String name;
+  final Type type;
+  var value;
+
+  Property(this.name, this.type);
+
+  setValue(newValue) {
+    if (newValue is String && type != String) {
+      if (type == num) {
+        return value = num.parse(newValue);
+      }
+    }
+
+    value = newValue;
   }
 }
 
@@ -168,9 +187,15 @@ var logicNodes = [
 
 var otherNodes = [
   new NodeClass(
-      'Constant Value',
-      outputs: {'': dynamic},
-      properties: {'value': dynamic},
+      'Constant String',
+      outputs: {'': String},
+      properties: {'value': String},
+      getters: {'': (inputs, properties) => properties['value']}
+  ),
+  new NodeClass(
+      'Constant Number',
+      outputs: {'': num},
+      properties: {'value': num},
       getters: {'': (inputs, properties) => properties['value']}
   ),
 ];

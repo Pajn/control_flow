@@ -1,5 +1,11 @@
 part of raxa;
 
+class SelectNodeEvent {
+  final NodeComponent nodeComponent;
+
+  SelectNodeEvent(this.nodeComponent);
+}
+
 class StartDragNodeEvent {
   final Point offset;
   final NodeComponent nodeComponent;

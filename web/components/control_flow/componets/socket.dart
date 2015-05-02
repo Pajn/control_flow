@@ -3,6 +3,7 @@ part of raxa;
 const colors = const {
   bool: 'red',
   num: 'cornflowerblue',
+  String: 'gold',
   dynamic: 'white',
 };
 
@@ -14,12 +15,17 @@ class SocketComponent extends SvgComponent {
   bool moved = false;
 
   var attrs;
+  var offset;
 
   Node get node => socket.node;
   Type get type => socket.valueType;
   SocketType get socketType => socket.socketType;
 
   SocketComponent(this.socket);
+
+  attached() {
+    offset = element.ownerSvgElement.getBoundingClientRect().topLeft - new Point(5, 5);
+  }
 
   init() {
     attrs = {'stroke': colors[type], 'fill': 'black', 'r': '5', 'stroke-width': '2'};
@@ -29,8 +35,8 @@ class SocketComponent extends SvgComponent {
 
       Rectangle bb = element.getBoundingClientRect();
       draggingConnection = new ConnectionComponent(new Connection()
-        ..start = bb.topLeft + new Point(5, 5)
-        ..end = bb.topLeft + new Point(5, 5)
+        ..start = bb.topLeft - offset
+        ..end = bb.topLeft - offset
         ..type = type
         ..startSocket = socket
       );
@@ -57,12 +63,12 @@ class SocketComponent extends SvgComponent {
       if (socket.socketType == SocketType.output) {
         connections.add(
             draggingConnection
-              ..connection.start = bb.topLeft + new Point(5, 5)
+              ..connection.start = bb.topLeft - offset
         );
       } else {
         connections.add(
             draggingConnection
-              ..connection.end = bb.topLeft + new Point(5, 5)
+              ..connection.end = bb.topLeft - offset
         );
       }
       dispatcher.add(new StopCreateConnectionEvent(draggingConnection, created: true));
@@ -106,9 +112,9 @@ class SocketComponent extends SvgComponent {
       Rectangle bb = element.getBoundingClientRect();
       for (var connection in connections) {
         if (socketType == SocketType.output) {
-          connection.connection.start = bb.topLeft + new Point(5, 5);
+          connection.connection.start = bb.topLeft - offset;
         } else {
-          connection.connection.end = bb.topLeft + new Point(5, 5);
+          connection.connection.end = bb.topLeft - offset;
         }
 
         connection.invalidate();

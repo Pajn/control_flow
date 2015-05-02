@@ -27,7 +27,9 @@ class NodeComponent extends SvgComponent<Node> {
     _oldWidth = width;
     return width;
   }
-  get height => (math.max(node.inputs.length, node.outputs.length) * 25 + 10).toString();
+  get height => math.max(node.inputs.length, node.outputs.length) * 25 + 10;
+
+  get position => new Rectangle(x, y, width, height + 30);
 
   NodeComponent(this.node);
 
@@ -42,7 +44,7 @@ class NodeComponent extends SvgComponent<Node> {
     addSubscription(element.onMouseDown.listen((e) {
       e.stopPropagation();
 
-      dispatcher.add(new StartDragNodeEvent(e.page, this));
+      dispatcher.add(new StartDragNodeEvent(e.offset, this));
     }));
 
     addSubscription(dispatcher.stream.listen((e) {
@@ -61,7 +63,7 @@ class NodeComponent extends SvgComponent<Node> {
   updateView() {
     var children = [
       rect(attrs: {'x': '0', 'y': '0', 'width': '$width', 'height': '30', 'fill': dragging ? 'rgba(50, 250, 50, .5)' : 'rgba(50, 250, 50, .9)'}),
-      rect(attrs: {'x': '0', 'y': '30', 'width': '$width', 'height': height, 'fill': dragging ? 'rgba(50, 50, 50, .5)' : 'rgba(50, 50, 50, .7)'}),
+      rect(attrs: {'x': '0', 'y': '30', 'width': '$width', 'height': '$height', 'fill': dragging ? 'rgba(50, 50, 50, .5)' : 'rgba(50, 50, 50, .7)'}),
       text(attrs: const {'x': '5', 'y': '20', 'fill': 'white'})(node.nodeClass.name),
     ];
 

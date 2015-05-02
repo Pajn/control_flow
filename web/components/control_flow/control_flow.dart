@@ -4,90 +4,37 @@ List<NodeComponent> createdNodes = <NodeComponent>[];
 List<ConnectionComponent> createdConnections = <ConnectionComponent>[];
 
 class ControlFlow extends Component {
-  StartDragNodeEvent draggingNode;
-  ConnectionComponent draggingConnection;
-
-  var menuData = new MenuData();
+  Node selectedNode;
+  PropertiesComponent propertiesComponent;
+  var p;
+  VNode graphNode;
 
   init() {
-    addSubscription(element.onClick.matches('#background').listen((MouseEvent e) {
-      menuData..position = e.page
-              ..open = true;
-      invalidate();
-    }));
-
-    addSubscription(element.onMouseMove.listen((e) {
-      if (draggingNode != null) {
-        draggingNode.node.position = e.page - draggingNode.offset;
-        draggingNode.nodeComponent.invalidate();
-        invalidate();
-      } else if (draggingConnection != null) {
-        if (draggingConnection.connection.startSocket.socketType == SocketType.output) {
-          draggingConnection.connection.end = e.page;
-        } else {
-          draggingConnection.connection.start = e.page;
-        }
-        draggingConnection.invalidate();
-      }
-    }));
-
-    addSubscription(element.onMouseUp.listen((e) {
-      if (draggingNode != null) {
-        draggingNode.node.position = e.page - draggingNode.offset;
-        dispatcher.add(new StopDragNodeEvent(draggingNode.nodeComponent));
-        draggingNode.nodeComponent.dragging = false;
-        draggingNode.nodeComponent.invalidate();
-        draggingNode = null;
-      } else if (draggingConnection != null) {
-        createdConnections.remove(draggingConnection);
-        dispatcher.add(new StopCreateConnectionEvent(draggingConnection));
-        invalidate();
-      }
-    }));
+    propertiesComponent = new PropertiesComponent();
+    p = () => propertiesComponent;
+    graphNode = vComponent(graphComponent, classes: const ['flex'], key: 'graph');
 
     addSubscription(dispatcher.stream.listen((e) {
-      if (e is StartDragNodeEvent) {
-        createdNodes.remove(e.nodeComponent);
-        createdNodes.add(e.nodeComponent);
-        draggingNode = e;
+      if (e is SelectNodeEvent) {
+        if (e.nodeComponent == null) {
+          selectedNode = null;
+        } else {
+          selectedNode = e.nodeComponent.node;
+        }
+        propertiesComponent.invalidate();
+        graphNode.cref.invalidate();
         invalidate();
-      } else if (e is StartCreateConnectionEvent) {
-        createdConnections.add(e.connection);
-        draggingConnection = e.connection;
-        invalidate();
-      } else if (e is StopCreateConnectionEvent) {
-        draggingConnection.invalidate();
-        draggingConnection = null;
       } else if (e is RemoveConnectionEvent) {
         createdConnections.remove(e.connection);
-        invalidate();
+        graphNode.cref.invalidate();
       }
     }));
   }
 
   updateView() {
-    var nodesToDraw = createdNodes.map(nodeComponent).toList()
-      ..addAll(createdConnections.map(connectionComponent));
-
-    updateRoot(vRoot(classes: ['fill'])([
-      vSvgElement('svg', type: 'GraphRoot', attrs: const {'width': '100%', 'height': '100%'})([
-        vSvgElement('defs')([
-          vSvgElement('pattern', attrs: const {'id': 'grid', 'width': '100', 'height': '100', 'patternUnits': 'userSpaceOnUse'})([
-            rect(attrs: const {'x': '0', 'y': '0', 'width': '100', 'height': '100', 'fill': '#555'}),
-            path(attrs: const {'d': 'M 100 0 L 100 100', 'stroke': 'rgba(255, 165, 0, .8)'}),
-            path(attrs: const {'d': 'M 0 100 L 100 100', 'stroke': 'rgba(255, 165, 0, .8)'}),
-            path(attrs: const {'d': 'M 50 0 L 50 100', 'stroke': 'rgba(255, 165, 0, .5)'}),
-            path(attrs: const {'d': 'M 0 50 L 100 50', 'stroke': 'rgba(255, 165, 0, .5)'}),
-          ]),
-        ]),
-        rect(attrs: const {
-          'id': 'background', 'x': '0', 'y': '0', 'width': '100%', 'height': '100%', 'fill': 'url(#grid)',
-        }),
-        g()(nodesToDraw)
-      ]),
-      vComponent(menu([]..addAll(comparisonNodes)..addAll(mathNodes)..addAll(logicNodes)..addAll(otherNodes)),
-        data: menuData
-      ),
+    updateRoot(vRoot(type: 'workspace', classes: const ['fill'])([
+      vComponent(p, data: selectedNode, key: 'properties', type: 'properties'),
+      graphNode,
     ]));
   }
 }
