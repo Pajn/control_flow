@@ -54,7 +54,7 @@ class NodeComponent extends SvgComponent<Node> {
 
   updateSockets() {
     for (SocketComponent socket in sockets.values) {
-      socket.updateConnection();
+      socket.updateConnections();
     }
   }
 

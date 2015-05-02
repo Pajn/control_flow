@@ -10,7 +10,7 @@ class SocketComponent extends SvgComponent {
   static ConnectionComponent draggingConnection;
   final String tag = 'g';
   final Socket socket;
-  ConnectionComponent connection;
+  List<ConnectionComponent> connections = [];
   bool moved = false;
 
   var attrs;
@@ -28,30 +28,38 @@ class SocketComponent extends SvgComponent {
       e.stopPropagation();
 
       Rectangle bb = element.getBoundingClientRect();
-      draggingConnection = connection = new ConnectionComponent(new Connection()
+      draggingConnection = new ConnectionComponent(new Connection()
         ..start = bb.topLeft + new Point(5, 5)
         ..end = bb.topLeft + new Point(5, 5)
         ..type = type
         ..startSocket = socket
       );
 
-      dispatcher.add(new StartCreateConnectionEvent(connection));
+      connections.add(draggingConnection);
+
+      dispatcher.add(new StartCreateConnectionEvent(draggingConnection));
     }));
 
     addSubscription(element.onMouseUp.listen((e) {
       e.stopPropagation();
 
-      if (socket.socketType == SocketType.input && connection != null) {
-        dispatcher.add(new RemoveConnectionEvent(connection));
+      if (socket.socketType == SocketType.input && connections.isNotEmpty) {
+        for (var connection in connections) {
+          dispatcher.add(new RemoveConnectionEvent(connection));
+        }
       }
 
       Rectangle bb = element.getBoundingClientRect();
       if (socket.socketType == SocketType.output) {
-        connection = draggingConnection
-          ..connection.start = bb.topLeft + new Point(5, 5);
+        connections.add(
+            draggingConnection
+              ..connection.start = bb.topLeft + new Point(5, 5)
+        );
       } else {
-        connection = draggingConnection
-          ..connection.end = bb.topLeft + new Point(5, 5);
+        connections.add(
+            draggingConnection
+              ..connection.end = bb.topLeft + new Point(5, 5)
+        );
       }
       dispatcher.add(new StopCreateConnectionEvent(draggingConnection, created: true));
     }));
@@ -62,12 +70,14 @@ class SocketComponent extends SvgComponent {
       } else if (e is StopCreateConnectionEvent) {
         draggingConnection = null;
         invalidate();
+      } else if (e is RemoveConnectionEvent) {
+        connections.remove(e.connection);
       }
     }));
   }
 
-  updateConnection() {
-    if (connection != null) {
+  updateConnections() {
+    if (connections.isNotEmpty) {
       moved = true;
       invalidate();
     }
@@ -90,13 +100,15 @@ class SocketComponent extends SvgComponent {
       moved = false;
 
       Rectangle bb = element.getBoundingClientRect();
-      if (socketType == SocketType.output) {
-        connection.connection.start = bb.topLeft + new Point(5, 5);
-      } else {
-        connection.connection.end = bb.topLeft + new Point(5, 5);
-      }
+      for (var connection in connections) {
+        if (socketType == SocketType.output) {
+          connection.connection.start = bb.topLeft + new Point(5, 5);
+        } else {
+          connection.connection.end = bb.topLeft + new Point(5, 5);
+        }
 
-      connection.invalidate();
+        connection.invalidate();
+      }
     }
   }
 }
