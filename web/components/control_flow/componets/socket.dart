@@ -21,10 +21,12 @@ class SocketComponent extends SvgComponent {
   Type get type => socket.valueType;
   SocketType get socketType => socket.socketType;
 
+  Point get center => element.getBoundingClientRect().topLeft - offset;
+
   SocketComponent(this.socket);
 
   attached() {
-    offset = element.ownerSvgElement.getBoundingClientRect().topLeft - new Point(5, 5);
+    offset = element.ownerSvgElement.getBoundingClientRect().topLeft - const Point(5, 5);
   }
 
   init() {
@@ -33,45 +35,57 @@ class SocketComponent extends SvgComponent {
     addSubscription(element.onMouseDown.listen((e) {
       e.stopPropagation();
 
-      Rectangle bb = element.getBoundingClientRect();
-      draggingConnection = new ConnectionComponent(new Connection()
-        ..start = bb.topLeft - offset
-        ..end = bb.topLeft - offset
-        ..type = type
-        ..startSocket = socket
-      );
+      if (e.ctrlKey) {
+        dispatcher.add(new OpenDisplayEvent(
+            new Display(this)
+              ..socketPosition = center
+              ..position = center
+        ));
+      } else {
+        draggingConnection = new ConnectionComponent(
+          new Connection()
+            ..start = center
+            ..end = center
+            ..type = type
+            ..startSocket = socket
+            ..endSocket = socket
+        );
 
-      connections.add(draggingConnection);
+        connections.add(draggingConnection);
 
-      dispatcher.add(new StartCreateConnectionEvent(draggingConnection));
+        dispatcher.add(new StartCreateConnectionEvent(draggingConnection));
+      }
     }));
 
     addSubscription(element.onMouseUp.listen((e) {
-      e.stopPropagation();
+      if (draggingConnection != null) {
+        e.stopPropagation();
 
-      if (socket.socketType == SocketType.input && connections.isNotEmpty) {
-        for (var connection in connections) {
-          dispatcher.add(new RemoveConnectionEvent(connection));
+        if (socket.socketType == SocketType.input && connections.isNotEmpty) {
+          for (var connection in connections) {
+            dispatcher.add(new RemoveConnectionEvent(connection));
+          }
         }
-      }
 
-      if (draggingConnection.type == dynamic) {
-        draggingConnection.connection.type = type;
-      }
+        if (draggingConnection.type == dynamic) {
+          draggingConnection.connection.type = type;
+        }
 
-      Rectangle bb = element.getBoundingClientRect();
-      if (socket.socketType == SocketType.output) {
-        connections.add(
-            draggingConnection
-              ..connection.start = bb.topLeft - offset
-        );
-      } else {
-        connections.add(
-            draggingConnection
-              ..connection.end = bb.topLeft - offset
-        );
+        if (socket.socketType == SocketType.output) {
+          connections.add(
+              draggingConnection
+                ..connection.start = center
+                ..connection.startSocket = socket
+          );
+        } else {
+          connections.add(
+              draggingConnection
+                ..connection.end = center
+                ..connection.endSocket = socket
+          );
+        }
+        dispatcher.add(new StopCreateConnectionEvent(draggingConnection, created: true));
       }
-      dispatcher.add(new StopCreateConnectionEvent(draggingConnection, created: true));
     }));
 
     addSubscription(dispatcher.stream.listen((e) {
@@ -82,15 +96,11 @@ class SocketComponent extends SvgComponent {
         invalidate();
       } else if (e is RemoveConnectionEvent) {
         connections.remove(e.connection);
+      } else if (e is NodeMovedEvent && e.node == node) {
+        moved = true;
+        invalidate();
       }
     }));
-  }
-
-  updateConnections() {
-    if (connections.isNotEmpty) {
-      moved = true;
-      invalidate();
-    }
   }
 
   updateView() {
@@ -109,12 +119,11 @@ class SocketComponent extends SvgComponent {
     if (moved) {
       moved = false;
 
-      Rectangle bb = element.getBoundingClientRect();
       for (var connection in connections) {
         if (socketType == SocketType.output) {
-          connection.connection.start = bb.topLeft - offset;
+          connection.connection.start = center;
         } else {
-          connection.connection.end = bb.topLeft - offset;
+          connection.connection.end = center;
         }
 
         connection.invalidate();

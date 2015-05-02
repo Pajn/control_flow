@@ -3,10 +3,12 @@ part of raxa;
 class GraphComponent extends Component {
   StartDragNodeEvent draggingNode;
   ConnectionComponent draggingConnection;
+  StartDragDisplayEvent draggingDisplay;
 
   var menuData = new MenuData();
   var offset;
   var selectedNode;
+  var openDisplays = [];
 
   init() {
     addSubscription(element.onClick.matches('#background').listen((MouseEvent e) {
@@ -19,7 +21,7 @@ class GraphComponent extends Component {
     addSubscription(element.onMouseMove.listen((e) {
       if (draggingNode != null) {
         draggingNode.node.position = e.page - offset - draggingNode.offset;
-        draggingNode.nodeComponent.invalidate();
+        dispatcher.add(new NodeMovedEvent(draggingNode.nodeComponent));
         invalidate();
       } else if (draggingConnection != null) {
         if (draggingConnection.connection.startSocket.socketType == SocketType.output) {
@@ -28,19 +30,25 @@ class GraphComponent extends Component {
           draggingConnection.connection.start = e.page - offset;
         }
         draggingConnection.invalidate();
+      } else if (draggingDisplay != null) {
+        draggingDisplay.display.position = e.page - offset - draggingDisplay.offset;
+        invalidate();
       }
     }));
 
     addSubscription(element.onMouseUp.listen((e) {
       if (draggingNode != null) {
         draggingNode.node.position = e.page - offset - draggingNode.offset;
+        dispatcher.add(new NodeMovedEvent(draggingNode.nodeComponent));
         dispatcher.add(new StopDragNodeEvent(draggingNode.nodeComponent));
-        draggingNode.nodeComponent.dragging = false;
-        draggingNode.nodeComponent.invalidate();
         draggingNode = null;
       } else if (draggingConnection != null) {
         createdConnections.remove(draggingConnection);
         dispatcher.add(new StopCreateConnectionEvent(draggingConnection));
+        invalidate();
+      } else if (draggingDisplay != null) {
+        draggingDisplay.display.position = e.page - offset - draggingDisplay.offset;
+        draggingDisplay = null;
         invalidate();
       }
     }));
@@ -61,6 +69,12 @@ class GraphComponent extends Component {
       } else if (e is StopCreateConnectionEvent) {
         draggingConnection.invalidate();
         draggingConnection = null;
+      } else if (e is OpenDisplayEvent) {
+        openDisplays.add(e.display);
+        dispatcher.add(new StartDragDisplayEvent(e.display));
+        invalidate();
+      } else if (e is StartDragDisplayEvent) {
+        draggingDisplay = e;
       }
     }));
   }
@@ -68,10 +82,11 @@ class GraphComponent extends Component {
   updateView() {
     var nodesToDraw = createdNodes.map(nodeComponent).toList()
       ..addAll(createdConnections.map(connectionComponent));
+    var displaysToDraw = openDisplays.map((display) => vComponent(displayComponent, data: display, key: display.position));
     var selections = const [];
 
     if (selectedNode != null) {
-      selections = [vComponent(selectedComponent, data: selectedNode.position)];
+      selections = [vComponent(selectedComponent, data: selectedNode)];
     }
 
     updateRoot(vRoot(style: const {'display': 'flex', 'flex-direction': 'column'})([
@@ -90,6 +105,7 @@ class GraphComponent extends Component {
         }),
         g()(selections),
         g()(nodesToDraw),
+        g()(displaysToDraw),
       ]),
       vComponent(menu(
           []..addAll(comparisonNodes)..addAll(mathNodes)..addAll(logicNodes)..addAll(otherNodes)),

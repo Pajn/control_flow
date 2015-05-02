@@ -29,8 +29,6 @@ class NodeComponent extends SvgComponent<Node> {
   }
   get height => math.max(node.inputs.length, node.outputs.length) * 25 + 10;
 
-  get position => new Rectangle(x, y, width, height + 30);
-
   NodeComponent(this.node);
 
   init() {
@@ -48,16 +46,13 @@ class NodeComponent extends SvgComponent<Node> {
     }));
 
     addSubscription(dispatcher.stream.listen((e) {
-      if (e is StopDragNodeEvent && e.nodeComponent == this) {
-        updateSockets();
+      if (e is NodeMovedEvent && e.nodeComponent == this) {
+        invalidate();
+      } else if (e is StopDragNodeEvent && e.nodeComponent == this) {
+        dragging = false;
+        invalidate();
       }
     }));
-  }
-
-  updateSockets() {
-    for (SocketComponent socket in sockets.values) {
-      socket.updateConnections();
-    }
   }
 
   updateView() {
@@ -81,17 +76,11 @@ class NodeComponent extends SvgComponent<Node> {
       tmpY += 25;
       return g(attrs: {'transform': 'translate(${width - 10}, $tmpY)'})([
         socketComponent(sockets[socket]),
-        text(attrs: const {'x': '75', 'y': '5', 'r': '5', 'fill': 'white', 'textAnchor': 'end'}, key: socket.name)(socket.name),
+        text(attrs: const {'x': '75', 'y': '5', 'r': '5', 'fill': 'white', 'text-anchor': 'end'}, key: socket.name)(socket.name),
       ]);
     }));
 
     updateRoot(g(attrs: {'transform': 'translate($x, $y)'})(children));
-  }
-
-  updated() {
-    if (dragging) {
-      updateSockets();
-    }
   }
 }
 

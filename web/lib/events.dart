@@ -18,6 +18,13 @@ class StartDragNodeEvent {
   }
 }
 
+class NodeMovedEvent {
+  final NodeComponent nodeComponent;
+  Node get node => nodeComponent.node;
+
+  NodeMovedEvent(this.nodeComponent);
+}
+
 class StopDragNodeEvent {
   final NodeComponent nodeComponent;
 
@@ -47,4 +54,17 @@ class RemoveConnectionEvent {
   final ConnectionComponent connection;
 
   RemoveConnectionEvent(this.connection);
+}
+
+class OpenDisplayEvent {
+  final Display display;
+
+  OpenDisplayEvent(this.display);
+}
+
+class StartDragDisplayEvent {
+  final Display display;
+  final Point offset;
+
+  StartDragDisplayEvent(this.display, [this.offset = const Point(0, 0)]);
 }

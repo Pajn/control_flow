@@ -70,6 +70,7 @@ class Connection {
   Point start, end;
   Type type;
   Socket startSocket;
+  Socket endSocket;
 }
 
 var comparisonNodes = [
