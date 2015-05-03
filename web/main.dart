@@ -3,6 +3,7 @@ library raxa;
 import 'dart:async';
 import 'dart:html';
 import 'dart:math' as math;
+import 'dart:svg' show SvgElement;
 
 import 'package:uix/uix.dart';
 

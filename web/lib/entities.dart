@@ -206,4 +206,10 @@ var otherNodes = [
       properties: {'value': num},
       getters: {'': (inputs, properties) => properties['value']}
   ),
+  new NodeClass(
+      'Constant Boolean',
+      outputs: {'': bool},
+      properties: {'enabled': bool},
+      getters: {'': (inputs, properties) => properties['enabled']}
+  ),
 ];

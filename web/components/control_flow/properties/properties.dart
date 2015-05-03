@@ -8,17 +8,32 @@ class PropertyComponent extends Component<Property> {
       dispatcher.add(new PropertyChangedEvent());
     }));
     addSubscription(element.onChange.listen((e) {
-      print(e.target.value);
-      data.setValue(e.target.value);
+      if (data.type == bool) {
+        data.value = e.target.checked;
+      } else {
+        data.setValue(e.target.value);
+      }
       dispatcher.add(new PropertyChangedEvent());
     }));
   }
 
   updateView() {
+    var input;
+
+    if (data.type == num) {
+      input = vElement('input', attrs: {'value': data.value.toString(), 'type': 'number'});
+    } else if (data.type == bool && data.value == true) {
+      input = vElement('input', attrs: {'checked': '', 'type': 'checkbox'});
+    } else if (data.type == bool) {
+      input = vElement('input', attrs: const {'type': 'checkbox'});
+    } else {
+      input = vElement('input', attrs: {'value': data.value.toString()});
+    }
+
     updateRoot(vRoot(type: 'property')([
       vElement('label')([
         vElement('span')(vText(data.name)),
-        vElement('input', attrs: {'value': data.value.toString()}),
+        input,
       ]),
     ]));
   }

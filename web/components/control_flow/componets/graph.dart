@@ -93,11 +93,15 @@ class GraphComponent extends Component {
       vSvgElement('svg', type: 'graph', classes: const ['flex'])([
         vSvgElement('defs')([
           vSvgElement('pattern', attrs: const {'id': 'grid', 'width': '100', 'height': '100', 'patternUnits': 'userSpaceOnUse'})([
-            rect(attrs: const {'x': '0', 'y': '0', 'width': '100', 'height': '100', 'fill': '#444'}),
-            path(attrs: const {'d': 'M 100 0 L 100 100', 'stroke': 'rgba(165, 165, 50, .6)'}),
-            path(attrs: const {'d': 'M 0 100 L 100 100', 'stroke': 'rgba(165, 165, 50, .6)'}),
-            path(attrs: const {'d': 'M 50 0 L 50 100', 'stroke': 'rgba(165, 165, 50, .3)'}),
-            path(attrs: const {'d': 'M 0 50 L 100 50', 'stroke': 'rgba(165, 165, 50, .3)'}),
+            rect(attrs: const {'x': '0', 'y': '0', 'width': '100', 'height': '100', 'fill': '#2B2B2B'}),
+            path(attrs: const {'d': 'M 100 0 L 100 100', 'stroke': 'rgba(165, 165, 165, .6)'}),
+            path(attrs: const {'d': 'M 0 100 L 100 100', 'stroke': 'rgba(165, 165, 165, .6)'}),
+            path(attrs: const {'d': 'M 25 0 L 25 100', 'stroke': 'rgba(165, 165, 165, .2)'}),
+            path(attrs: const {'d': 'M 50 0 L 50 100', 'stroke': 'rgba(165, 165, 165, .2)'}),
+            path(attrs: const {'d': 'M 75 0 L 75 100', 'stroke': 'rgba(165, 165, 165, .2)'}),
+            path(attrs: const {'d': 'M 0 25 L 100 25', 'stroke': 'rgba(165, 165, 165, .2)'}),
+            path(attrs: const {'d': 'M 0 50 L 100 50', 'stroke': 'rgba(165, 165, 165, .2)'}),
+            path(attrs: const {'d': 'M 0 75 L 100 75', 'stroke': 'rgba(165, 165, 165, .2)'}),
           ]),
         ]),
         rect(attrs: const {

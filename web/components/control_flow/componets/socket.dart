@@ -26,6 +26,7 @@ class SocketComponent extends SvgComponent {
   SocketComponent(this.socket);
 
   attached() {
+    SvgElement element = this.element;
     offset = element.ownerSvgElement.getBoundingClientRect().topLeft - const Point(5, 5);
   }
 
