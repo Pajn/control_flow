@@ -32,7 +32,7 @@ class DisplayComponent extends SvgComponent<Display> {
   }
 
   init() {
-    addSubscription(element.matches('rect').onMouseDown.listen((e) {
+    addSubscription(element.onMouseDown.matches('rect').listen((e) {
       e.stopPropagation();
 
       dispatcher.add(new StartDragDisplayEvent(data, e.offset - data.position));
@@ -50,7 +50,7 @@ class DisplayComponent extends SvgComponent<Display> {
 
   updateView() {
     updateRoot(g()([
-      path(classes: 'no-pointer', attrs: {
+      path(classes: const ['no-pointer'], attrs: {
         'fill': 'none', 'stroke': 'white', 'stroke-width': '1',
         'd': 'M ${data.socketPosition.x} ${data.socketPosition.y} L $lineX $lineY',
       }),
